@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "411460404526",
+    "project_id": "safe-hands-f0cb0",
+    "storage_bucket": "safe-hands-f0cb0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:411460404526:android:b96822bb0b9dd3be3b66bf",
+        "android_client_info": {
+          "package_name": "com.example.women_safety_application"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBphT5oaDvKaIkFFe_xMHBv51X_53AJYoU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
