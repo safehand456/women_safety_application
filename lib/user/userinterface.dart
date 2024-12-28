@@ -3,6 +3,25 @@ import 'package:women_safety_application/auth/contactlist.dart';
 
 
 class HomePage extends StatelessWidget {
+
+  void showAlertDialog(BuildContext context){
+    showDialog(context: context, builder: (context) {
+      return AlertDialog(
+       title: Text('Enable Alert Mode?'),
+content: Text('This will activate the alert system to notify your contacts in case of emergency.'),
+actions: [
+  TextButton(onPressed: (){
+    Navigator.pop(context);
+  }, child: Text('Cancel')),
+  TextButton(onPressed: (){
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Alert Mode Enabled')));
+    Navigator.pop(context);
+  }, child: Text('OK'))
+],
+
+      );
+    },);
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,7 +79,9 @@ class HomePage extends StatelessWidget {
                   SizedBox(height: 20),
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(fixedSize: Size(300, 60)),
-                    onPressed: () {},
+                    onPressed: () {
+                      showAlertDialog(context);
+                    },
                     icon: Icon(Icons.notification_important),
                     label: Text(
                       'Alert Mode',
