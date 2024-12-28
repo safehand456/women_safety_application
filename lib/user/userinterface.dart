@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:women_safety_application/auth/contactlist.dart';
+import 'package:women_safety_application/user/my_contact_list.dart';
 
 
 class HomePage extends StatelessWidget {
@@ -90,7 +91,37 @@ actions: [
                       ),
                     ),
                   ),
+
+                   ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(fixedSize: Size(300, 60)),
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => ContactListScreen()));
+                    },
+                    icon: Icon(Icons.notification_important),
+                    label: Text(
+                      'Contact',
+                      style: TextStyle(
+                        color: const Color.fromARGB(255, 204, 50, 158),
+                      ),
+                    ),
+                  ),
                   SizedBox(height: 20),
+
+                   ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(fixedSize: Size(300, 60)),
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => MyphoneContactList()));
+                    },
+                    icon: Icon(Icons.notification_important),
+                    label: Text(
+                      'phone contat',
+                      style: TextStyle(
+                        color: const Color.fromARGB(255, 204, 50, 158),
+                      ),
+                    ),
+                  ),
+                    SizedBox(height: 20),
+
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(fixedSize: Size(300, 60)),
                     onPressed: () {},
