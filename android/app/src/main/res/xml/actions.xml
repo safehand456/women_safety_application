@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<actions xmlns:android="http://schemas.android.com/apk/res/android">
+    <action android:name="actions.intent.OPEN_APP_FEATURE">
+        <parameter
+            android:key="feature"
+            android:defaultValue="help" />
+    </action>
+</actions>

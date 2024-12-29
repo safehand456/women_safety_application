@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:women_safety_application/user/userinterface.dart';
+ // Replace with your HomePage or main screen file.
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
   _LoginPageState createState() => _LoginPageState();
 }
 
@@ -16,6 +17,13 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
+
+  Future<void> saveAuthData(String ? name) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if(name != null){
+      await prefs.setString('auth_user', name);
+    }
+  }
 
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
@@ -41,13 +49,20 @@ class _LoginPageState extends State<LoginPage> {
             .get();
 
         if (userDoc.exists) {
-          // User document exists, navigate to home
+          // Get the user's name from Firestore
+          String  ? userName = userDoc['name'];
+
+          // Save the user's name in shared preferences
+          await saveAuthData(userName);
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Login Successful!')),
           );
+
+          // Navigate to Home
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => HomePage()),
+            MaterialPageRoute(builder: (context) => HomePage()), // Replace with your HomePage
           );
         } else {
           // No document for the user
@@ -86,7 +101,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
-          title: Text('Login Page'),
+          title: const Text('Login Page'),
         ),
         body: Stack(
           children: [
@@ -110,7 +125,7 @@ class _LoginPageState extends State<LoginPage> {
                     // Email Field
                     TextFormField(
                       controller: _emailController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Email',
                         border: OutlineInputBorder(),
                       ),
@@ -118,19 +133,19 @@ class _LoginPageState extends State<LoginPage> {
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your email';
-                        } else if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
-                            .hasMatch(value)) {
-                          return 'Please enter a valid email';
-                        }
+                        } else if (RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+\$')
+                            .hasMatch(value))
+                          return 'enter valid mail';
+                        
                         return null;
                       },
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
                     // Password Field
                     TextFormField(
                       controller: _passwordController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Password',
                         border: OutlineInputBorder(),
                       ),
@@ -144,23 +159,22 @@ class _LoginPageState extends State<LoginPage> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
                     // Forgot Password
                     GestureDetector(
                       onTap: () {
-                        // Implement forgot password functionality here
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Forgot Password pressed')),
+                          const SnackBar(content: Text('Forgot Password pressed')),
                         );
                       },
-                      child: Text('Forgot Password?'),
+                      child: const Text('Forgot Password?'),
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
                     // Login Button
                     _isLoading
-                        ? CircularProgressIndicator()
+                        ? const CircularProgressIndicator()
                         : ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               foregroundColor:
@@ -169,7 +183,7 @@ class _LoginPageState extends State<LoginPage> {
                                   const Color.fromARGB(255, 226, 106, 206),
                             ),
                             onPressed: _login,
-                            child: Text('Login'),
+                            child: const Text('Login'),
                           ),
                   ],
                 ),
@@ -181,4 +195,3 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
-

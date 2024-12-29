@@ -2,22 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:women_safety_application/user/userinterface.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  runApp(MyApp());
-}
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: SignUpPage(),
-    );
-  }
-}
+
+
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -31,6 +22,14 @@ class _SignUpPageState extends State<SignUpPage> {
   final _passwordController = TextEditingController();
   final _phoneController = TextEditingController();
   bool _isLoading = false;
+
+
+  Future<void> saveAuthData(String ? name) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if(name != null){
+      await prefs.setString('auth_user', name);
+    }
+  }
 
   Future<void> _signUp() async {
     if (!_formKey.currentState!.validate()) return;
@@ -46,6 +45,8 @@ class _SignUpPageState extends State<SignUpPage> {
               email: _emailController.text.trim(),
               password: _passwordController.text.trim());
 
+      final payerId = OneSignal.User.pushSubscription.id;
+
       // Save user details in Firestore
       await FirebaseFirestore.instance
           .collection('user')
@@ -55,7 +56,13 @@ class _SignUpPageState extends State<SignUpPage> {
         'email': _emailController.text.trim(),
         'phone': _phoneController.text.trim(),
         'uid': userCredential.user!.uid,
+        'playerId': payerId
       });
+
+      String  ? userName = _nameController.text.trim();
+
+          // Save the user's name in shared preferences
+          await saveAuthData(userName);
 
       Navigator.push(
         context,
