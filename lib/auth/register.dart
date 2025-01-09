@@ -6,10 +6,6 @@ import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:women_safety_application/user/userinterface.dart';
 
-
-
-
-
 class SignUpPage extends StatefulWidget {
   @override
   _SignUpPageState createState() => _SignUpPageState();
@@ -23,10 +19,9 @@ class _SignUpPageState extends State<SignUpPage> {
   final _phoneController = TextEditingController();
   bool _isLoading = false;
 
-
-  Future<void> saveAuthData(String ? name) async {
+  Future<void> saveAuthData(String? name) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    if(name != null){
+    if (name != null) {
       await prefs.setString('auth_user', name);
     }
   }
@@ -59,10 +54,10 @@ class _SignUpPageState extends State<SignUpPage> {
         'playerId': payerId
       });
 
-      String  ? userName = _nameController.text.trim();
+      String? userName = _nameController.text.trim();
 
-          // Save the user's name in shared preferences
-          await saveAuthData(userName);
+      // Save the user's name in shared preferences
+      await saveAuthData(userName);
 
       Navigator.push(
         context,
@@ -172,6 +167,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     SizedBox(height: 16),
 
                     // Phone Number Field
+                    // Phone Number Field
                     TextFormField(
                       controller: _phoneController,
                       decoration: InputDecoration(
@@ -183,12 +179,13 @@ class _SignUpPageState extends State<SignUpPage> {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your phone number';
                         }
-                        if (!RegExp(r'^\+?\d{10,15}$').hasMatch(value)) {
-                          return 'Please enter a valid phone number';
+                        if (!RegExp(r'^\d{10}$').hasMatch(value)) {
+                          return 'Phone number must be exactly 10 digits';
                         }
                         return null;
                       },
                     ),
+
                     SizedBox(height: 16),
 
                     // Password Field
@@ -206,7 +203,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         if (value.length < 6) {
                           return 'Password must be at least 6 characters';
                         }
-                        
+
                         return null;
                       },
                     ),

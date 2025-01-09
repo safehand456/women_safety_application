@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:women_safety_application/auth/contactlist.dart';
 import 'package:women_safety_application/choosig.dart';
 import 'package:women_safety_application/notfy_dun.dart';
+import 'package:women_safety_application/user/camera.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -169,7 +170,7 @@ class _HomePageState extends State<HomePage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ContactListScreen(),
+                          builder: (context) => ContactScreen(),
                         ),
                       );
                     },
@@ -194,7 +195,22 @@ class _HomePageState extends State<HomePage> {
                         color: const Color.fromARGB(255, 204, 50, 158),
                       ),
                     ),
+                  ), 
+                  SizedBox(height: 20),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(fixedSize: Size(300, 60)),
+                    onPressed: () {
+                      Navigator.push(context,MaterialPageRoute(builder: (context)=> VideoRecordingScreen(),));
+                    },
+                    icon: Icon(Icons.notification_important),
+                    label: Text(
+                      'camera',
+                      style: TextStyle(
+                        color: const Color.fromARGB(255, 204, 50, 158),
+                      ),
+                    ),
                   ),
+                  
                   SizedBox(height: 20),
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(fixedSize: Size(300, 60)),
