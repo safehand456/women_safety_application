@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:women_safety_application/user/userinterface.dart';
  // Replace with your HomePage or main screen file.
@@ -40,8 +41,21 @@ class _LoginPageState extends State<LoginPage> {
         password: _passwordController.text.trim(),
       );
 
+      String ? pId;
+
+
+      final f = await OneSignal.shared.getDeviceState();
+         pId = f?.userId;
+
       User? user = userCredential.user;
       if (user != null) {
+
+
+       await FirebaseFirestore.instance
+            .collection('user')
+            .doc(user.uid).update({
+              'playerId': pId
+            });
         // Check Firestore for user document
         DocumentSnapshot userDoc = await FirebaseFirestore.instance
             .collection('user')

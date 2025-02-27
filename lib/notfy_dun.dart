@@ -2,10 +2,18 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:women_safety_application/firebase_options.dart';
 
 Future<void> sendNotificationToDevice(String title, String body) async {
+
+
+  print('notification');
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   const String oneSignalRestApiKey =
       'os_v2_app_mfyhj42elbd5febwakisecemgp74msqtewwerdm4qsavnp7ulpn6giak7zt6s7hwkont5vm37odjworsa4xtrzps4g6v5s36lnu7n3q';
   const String oneSignalAppId = '617074f3-4458-47d2-9036-029122088c33';
@@ -13,8 +21,8 @@ Future<void> sendNotificationToDevice(String title, String body) async {
   var playId = [];
 
   final addedData = await FirebaseFirestore.instance
-      .collection('contact')
-      .doc(FirebaseAuth.instance.currentUser!.uid)
+      .collection('favorites')
+      .where('userId', isEqualTo: (FirebaseAuth.instance.currentUser!.uid))
       .get();
 
       print('--------------------');
@@ -23,28 +31,49 @@ Future<void> sendNotificationToDevice(String title, String body) async {
 
 
   
-  final addedContacts = addedData.data();
-
+  final addedContacts = addedData.docs;
   if(addedContacts==null){
     return;
   }
   
   
-  final contactList = addedContacts['contactList'] as List<dynamic>;
 
   
 
   // Iterate over the contactList
-  for (var contact in contactList) {
-    if (contact is Map<String, dynamic>) {
-      playId.add(contact['playerId']);
+  for (var contact in addedContacts) {
+
+    print(contact.data()['phone']);
+
+
+    final userQuery = await FirebaseFirestore.instance
+      .collection('user')
+      .where('phone', isEqualTo: contact.data()['phone'])
+      .get();
+
+
+    for (var playerId in userQuery.docs){
+      playId.add(playerId.data()['playerId']);
+      print(playerId.data());
+
     }
+
+
+   
   }
 
   // Get the current position
   Position position = await Geolocator.getCurrentPosition(
     desiredAccuracy: LocationAccuracy.high,
   );
+
+ 
+
+  
+
+
+
+ 
 
   // Use the position data in your notification
   var url = Uri.parse('https://api.onesignal.com/notifications?c=push');
@@ -76,7 +105,7 @@ Future<void> sendNotificationToDevice(String title, String body) async {
       print("Notification Sent Successfully!");
       print(response.body);
     } else {
-      print("Failed to send notification: ${response.statusCode}");
+      print("Failed to send notification: ${response.body}");
     }
   } catch (e) {
     print("Error sending notification: $e");
@@ -94,3 +123,93 @@ String generateNearbyPoliceStationsUrl({
 
       return link;
 }
+
+
+
+Future<void> sendNotificationToSpecificUsers() async {
+  final String oneSignalAppId = "617074f3-4458-47d2-9036-029122088c33";
+  final String oneSignalRestApiKey = "os_v2_app_mfyhj42elbd5febwakisecemgp74msqtewwerdm4qsavnp7ulpn6giak7zt6s7hwkont5vm37odjworsa4xtrzps4g6v5s36lnu7n3q";
+
+
+      await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+      Position position = await Geolocator.getCurrentPosition(
+    desiredAccuracy: LocationAccuracy.high,
+  );
+
+    
+
+
+
+
+      final currentUserId = FirebaseAuth.instance.currentUser!.uid;
+
+// Step 1: Fetch all users
+final userQuery = await FirebaseFirestore.instance
+      .collection('user')
+      .get();
+
+// Step 2: Filter users where isOnline is true and exclude the current user
+final onlineUsers = userQuery.docs
+    .where((doc) => doc['isOnline'] == true && doc.id != currentUserId)
+    .toList();
+
+
+
+       var playId = [];
+
+      for (int i = 0; i < onlineUsers.length; i++){
+
+         final playerId = onlineUsers[i]; // playerId
+
+         
+
+
+        await FirebaseFirestore.instance.collection('chats').add({
+        'senderId': currentUserId,
+        'receiverId': playerId.id,
+        'message': generateNearbyPoliceStationsUrl(startLat:position.latitude,startLng: position.longitude),
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+
+
+
+      playId.add(playerId.data()['playerId']);
+     
+    }
+
+
+     print('pla===========yId');
+        print(playId);
+
+   
+
+
+
+
+
+  final response = await http.post(
+    Uri.parse('https://onesignal.com/api/v1/notifications'),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Basic $oneSignalRestApiKey',
+    },
+    body: jsonEncode(<String, dynamic>{
+      'app_id': oneSignalAppId,
+      'include_player_ids': playId,
+       "headings": {"en": 'Danger'},
+      'contents': {'en': 'plase help'},
+      "android_channel_id":"dd516c67-fa36-4153-a4d9-1490e0224f75",
+      "sound": "sos_sound", 
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    print('Notification sent successfully');
+    print(response.body);
+  } else {
+    print('Failed to send notification: ${response.body}');
+  }
+}
+

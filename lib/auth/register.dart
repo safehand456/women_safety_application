@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -40,7 +42,13 @@ class _SignUpPageState extends State<SignUpPage> {
               email: _emailController.text.trim(),
               password: _passwordController.text.trim());
 
-      final payerId = OneSignal.User.pushSubscription.id;
+              String? pId;
+
+         final f = await OneSignal.shared.getDeviceState();
+         pId = f?.userId;
+
+
+      
 
       // Save user details in Firestore
       await FirebaseFirestore.instance
@@ -51,7 +59,7 @@ class _SignUpPageState extends State<SignUpPage> {
         'email': _emailController.text.trim(),
         'phone': _phoneController.text.trim(),
         'uid': userCredential.user!.uid,
-        'playerId': payerId
+        'playerId': pid
       });
 
       String? userName = _nameController.text.trim();

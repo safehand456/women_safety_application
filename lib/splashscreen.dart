@@ -1,8 +1,5 @@
-import 'dart:async';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:women_safety_application/choosig.dart';
 import 'package:women_safety_application/notfy_dun.dart';
@@ -49,8 +46,7 @@ setState(() {
     isLogged = prefs.getBool('alertMode');
      name = prefs.getString('auth_user');
 
-     print(isLogged);
-     print(name);
+   
 
     
     setState(() {
@@ -61,7 +57,9 @@ setState(() {
     if(name != null ){
       if(isLogged == true){
 
-      await sendNotificationToDevice('Alert', '$name  Danger click here to loction and call near police station' );
+     
+
+     await sendNotificationToSpecificUsers();
       
       
       Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context) => Scaffold(
