@@ -216,9 +216,11 @@ void onStart(ServiceInstance service) async {
         onResult: (result) async {
 
           print(result.recognizedWords.toLowerCase());
-          if (result.recognizedWords.toLowerCase().contains("hello")) {
-            print('help');
+          if (result.recognizedWords == "help") {
+            print('ooooooooo');
+            
             await sendNotificationToSpecificUsers();
+            print('send');
           }
         },
         listenFor: const Duration(days: 365), // Extended listening

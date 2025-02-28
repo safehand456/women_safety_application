@@ -134,7 +134,7 @@ Future<void> sendNotificationToSpecificUsers() async {
       await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
       Position position = await Geolocator.getCurrentPosition(
-    desiredAccuracy: LocationAccuracy.high,
+    desiredAccuracy: LocationAccuracy.low,
   );
 
     
@@ -168,7 +168,7 @@ final onlineUsers = userQuery.docs
         await FirebaseFirestore.instance.collection('chats').add({
         'senderId': currentUserId,
         'receiverId': playerId.id,
-        'message': generateNearbyPoliceStationsUrl(startLat:position.latitude,startLng: position.longitude),
+        'message': generateNearbyPoliceStationsUrl(startLat:position.latitude,startLng: position.longitude ),
         'timestamp': FieldValue.serverTimestamp(),
       });
 

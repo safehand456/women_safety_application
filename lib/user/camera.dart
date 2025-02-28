@@ -77,6 +77,7 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen> {
       if (await File(file.path).exists()) {
         print('Video file exists at path: ${file.path}');
         _uploadVideoToCloudinary(file.path);
+        Navigator.pop(context);
       } else {
         print('Error: Video file not found at path ${file.path}');
         ScaffoldMessenger.of(context).showSnackBar(
@@ -184,30 +185,24 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen> {
       appBar: AppBar(
         title: Text('Video Recording'),
       ),
-      body: Stack(
+      body: Column(
         children: [
-          Column(
-            children: <Widget>[
-              Expanded(
-                child: CameraPreview(_cameraController),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        _isRecording ? Icons.stop : Icons.fiber_manual_record,
-                        size: 50,
-                        color: Colors.red,
-                      ),
-                      onPressed: _isRecording ? _stopRecording : _startRecording,
-                    ),
-                  ],
+          Expanded(child: CameraPreview(_cameraController)),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: Icon(
+                    _isRecording ? Icons.stop : Icons.fiber_manual_record,
+                    size: 50,
+                    color: Colors.red,
+                  ),
+                  onPressed: _isRecording ? _stopRecording : _startRecording,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           if (_isLoading)
             Center(
