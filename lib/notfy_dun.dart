@@ -204,8 +204,8 @@ final onlineUsers = userQuery.docs
     body: jsonEncode(<String, dynamic>{
       'app_id': oneSignalAppId,
       'include_player_ids': playId,
-       "headings": {"en": 'Danger'},
-      'contents': {'en': 'plase help'},
+       "headings": {"en": 'Alert'},
+      'contents': {'en': 'please help'},
       "android_channel_id":"dd516c67-fa36-4153-a4d9-1490e0224f75",
       "sound": "sos_sound", 
     }),

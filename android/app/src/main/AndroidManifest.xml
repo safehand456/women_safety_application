@@ -23,7 +23,7 @@
     
     
     <application
-        android:label="women_safety_application"
+        android:label="Safe hand"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
