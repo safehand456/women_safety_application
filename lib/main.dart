@@ -4,7 +4,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:women_safety_application/firebase_options.dart';
 import 'package:women_safety_application/notfy_dun.dart';
 import 'package:women_safety_application/splashscreen.dart';
@@ -18,6 +21,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await _initNotifications();
 
   final userId =  FirebaseAuth.instance.currentUser?.uid;
 
@@ -58,6 +62,34 @@ void main() async {
   await initializeBackgroundService();
 
 
+   OneSignal.shared.setNotificationWillShowInForegroundHandler((OSNotificationReceivedEvent event) {
+    // Show local notification when a OneSignal notification is received
+    _showLocalNotification(event.notification.title ?? "New Alert", 
+                            event.notification.body ?? "You have a new message.");
+
+
+        scaffoldMessengerKey.currentState?.showSnackBar(
+      SnackBar(
+        content: Text('${event.notification.title}\n${event.notification.body}',style: const TextStyle(color: Colors.white),),
+        duration: const Duration(seconds: 5),
+        backgroundColor: Colors.red,
+        action: SnackBarAction(
+          label: 'View',
+          textColor: Colors.white,
+          onPressed: () {
+            // Navigate to a specific screen when the SnackBar action is pressed
+            navigatorKey.currentState?.push(
+              MaterialPageRoute(builder: (context) => UserListScreen()),
+            );
+          },
+        ),
+      ),
+    );
+
+   
+  });
+
+
   OneSignal.shared.setNotificationOpenedHandler((OSNotificationOpenedResult result) {
     print('ooooooooooooooooooooooooooosiwjsiwjiswjsiwjisjw');
     // Navigate to a specific page based on the notification data
@@ -67,10 +99,45 @@ void main() async {
     );
   });
 
+
+
   runApp( MainApp());
 }
 
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+// Initialize local notifications
+Future<void> _initNotifications() async {
+  const AndroidInitializationSettings androidSettings =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+
+  const InitializationSettings settings =
+      InitializationSettings(android: androidSettings);
+
+  await flutterLocalNotificationsPlugin.initialize(settings);
+}
+
+// Show local notification
+Future<void> _showLocalNotification(String title, String body) async {
+  const AndroidNotificationDetails androidDetails =
+      AndroidNotificationDetails('safe-hand-women-safety', 'safe-hand',
+          importance: Importance.high, priority: Priority.high);
+
+  const NotificationDetails notificationDetails =
+      NotificationDetails(android: androidDetails);
+
+  await flutterLocalNotificationsPlugin.show(
+      0, title, body, notificationDetails);
+}
+
+
+
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+
+
 
 class MainApp extends StatelessWidget {
    MainApp({super.key});
@@ -82,6 +149,7 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       navigatorKey: navigatorKey,
+      scaffoldMessengerKey: scaffoldMessengerKey,
       home: SplashScreen(),
       theme: ThemeData(
         fontFamily: 'robot',
@@ -164,6 +232,7 @@ void onStart(ServiceInstance service) async {
 
   startListening(); // Start listening
 }
+
 
 // Trigger the SOS alert
 void _triggerBackgroundSOS() async {

@@ -6,6 +6,7 @@ import 'package:women_safety_application/auth/contactlist.dart';
 import 'package:women_safety_application/choosig.dart';
 import 'package:women_safety_application/notfy_dun.dart';
 import 'package:women_safety_application/user/camera.dart';
+import 'package:women_safety_application/user/danger_location_screen.dart';
 import 'package:women_safety_application/user/faveriotcontact.dart';
 import 'package:women_safety_application/user/user_chat_list_screen.dart';
 import 'package:women_safety_application/user/user_profile_screen.dart';
@@ -224,7 +225,10 @@ class _HomePageState extends State<HomePage> {
                     
                       _buildButton(Icons.group, 'Community', WomenSafetyCommunityScreen()),
                       _buildButton(Icons.shopping_cart, 'Products', WomenSafetyProductsScreen()),
+                      _buildButton(Icons.location_city, 'unsafe location', DangerousPlacesMapScreen()),
+
                       _buildButton(Icons.person, 'My Profile', ProfileScreen()),
+                      
                       _buildButton(Icons.logout, 'Log out', null, _logout),
 
                     ],
