@@ -6,7 +6,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:women_safety_application/firebase_options.dart';
+import 'package:women_safety_application/main.dart';
 
 Future<void> sendNotificationToDevice(String title, String body) async {
 
@@ -133,9 +135,11 @@ Future<void> sendNotificationToSpecificUsers() async {
 
       await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-      Position position = await Geolocator.getCurrentPosition(
-    desiredAccuracy: LocationAccuracy.low,
-  );
+     
+
+  print(position);
+
+  final  prefs =  await  SharedPreferences.getInstance();
 
     
 
@@ -168,7 +172,7 @@ final onlineUsers = userQuery.docs
         await FirebaseFirestore.instance.collection('chats').add({
         'senderId': currentUserId,
         'receiverId': playerId.id,
-        'message': generateNearbyPoliceStationsUrl(startLat:position.latitude,startLng: position.longitude ),
+        'message': generateNearbyPoliceStationsUrl(startLat:prefs.getDouble('lat')?? 0,startLng: prefs.getDouble('lng')?? 0 ),
         'timestamp': FieldValue.serverTimestamp(),
       });
 
