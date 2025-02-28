@@ -172,6 +172,8 @@ final onlineUsers = userQuery.docs
         'timestamp': FieldValue.serverTimestamp(),
       });
 
+      print(playerId.data()['playerId']);
+
 
 
 
