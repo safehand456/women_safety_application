@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
@@ -17,11 +18,24 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:women_safety_application/user/user_chat_list_screen.dart';
 import 'package:women_safety_application/user/user_chat_screen.dart';
 
+
+Position  ? position;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await _initNotifications();
+
+   position = await Geolocator.getCurrentPosition(
+    desiredAccuracy: LocationAccuracy.low,
+  );
+print('=======================================');
+  print(position?.latitude);
+
+  final  prefs =  await  SharedPreferences.getInstance();
+
+  prefs.setDouble('lat', position!.latitude);
+  prefs.setDouble('lng', position!.longitude);
 
   final userId =  FirebaseAuth.instance.currentUser?.uid;
 
