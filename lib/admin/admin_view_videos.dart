@@ -10,48 +10,79 @@ class VideoListScreen extends StatefulWidget {
 }
 
 class _VideoListScreenState extends State<VideoListScreen> {
+  final TextEditingController _searchController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Video Gallery"),
         backgroundColor: Colors.pink.shade700,
+        elevation: 0,
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('videos')
-            .orderBy('timestamp', descending: true)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(child: Text("No videos found."));
-          }
+      body: Column(
+        children: [
+          // Search Bar
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Search by user or date...',
+                prefixIcon: Icon(Icons.search, color: Colors.pink.shade700),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.pink.shade700),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.pink.shade700),
+                ),
+              ),
+              onChanged: (value) {
+                // Implement search functionality here
+              },
+            ),
+          ),
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('videos')
+                  .orderBy('timestamp', descending: true)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return Center(child: Text("No videos found."));
+                }
 
-          var videos = snapshot.data!.docs;
+                var videos = snapshot.data!.docs;
 
-          return ListView.builder(
-            itemCount: videos.length,
-            itemBuilder: (context, index) {
-              var video = videos[index];
-              var timestamp = video['timestamp'].toDate();
-              var userId = video['userId'];
-              var videoUrl = video['videoUrl'];
-              var latitude = video['latitude'];
-              var longitude = video['longitude'];
+                return ListView.builder(
+                  itemCount: videos.length,
+                  itemBuilder: (context, index) {
+                    var video = videos[index];
+                    var timestamp = video['timestamp'].toDate();
+                    var userId = video['userId'];
+                    var videoUrl = video['videoUrl'];
+                    var latitude = video['latitude'];
+                    var longitude = video['longitude'];
 
-              return VideoCard(
-                timestamp: timestamp,
-                userId: userId,
-                videoUrl: videoUrl,
-                latitude: latitude,
-                longitude: longitude,
-              );
-            },
-          );
-        },
+                    return VideoCard(
+                      timestamp: timestamp,
+                      userId: userId,
+                      videoUrl: videoUrl,
+                      latitude: latitude,
+                      longitude: longitude,
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -79,6 +110,7 @@ class VideoCard extends StatefulWidget {
 class _VideoCardState extends State<VideoCard> {
   late VideoPlayerController _controller;
   bool _isPlaying = false;
+  bool _isFullScreen = false;
 
   @override
   void initState() {
@@ -104,6 +136,12 @@ class _VideoCardState extends State<VideoCard> {
         _controller.play();
         _isPlaying = true;
       }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullScreen = !_isFullScreen;
     });
   }
 
@@ -135,6 +173,18 @@ class _VideoCardState extends State<VideoCard> {
                   ),
                   onPressed: _togglePlayPause,
                 ),
+                Positioned(
+                  bottom: 10,
+                  right: 10,
+                  child: IconButton(
+                    icon: Icon(
+                      _isFullScreen ? Icons.fullscreen_exit : Icons.fullscreen,
+                      size: 30,
+                      color: Colors.white,
+                    ),
+                    onPressed: _toggleFullScreen,
+                  ),
+                ),
               ],
             ),
           ),
@@ -144,12 +194,18 @@ class _VideoCardState extends State<VideoCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Timestamp
-                Text(
-                  "Uploaded on: ${DateFormat('dd MMMM yyyy, hh:mm a').format(widget.timestamp)}",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
+                Row(
+                  children: [
+                    Icon(Icons.calendar_today, size: 16, color: Colors.pink.shade700),
+                    SizedBox(width: 8),
+                    Text(
+                      "Uploaded on: ${DateFormat('dd MMMM yyyy, hh:mm a').format(widget.timestamp)}",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
                 ),
                 SizedBox(height: 8),
                 // User ID
@@ -160,31 +216,49 @@ class _VideoCardState extends State<VideoCard> {
                       .get(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Text(
-                        "Uploaded by: Loading...",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
+                      return Row(
+                        children: [
+                          Icon(Icons.person, size: 16, color: Colors.pink.shade700),
+                          SizedBox(width: 8),
+                          Text(
+                            "Uploaded by: Loading...",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
                       );
                     }
                     if (snapshot.hasData && snapshot.data!.exists) {
                       var userData = snapshot.data!.data() as Map<String, dynamic>;
                       var userName = userData['name'] ?? "Unknown User";
-                      return Text(
-                        "Uploaded by: $userName",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
+                      return Row(
+                        children: [
+                          Icon(Icons.person, size: 16, color: Colors.pink.shade700),
+                          SizedBox(width: 8),
+                          Text(
+                            "Uploaded by: $userName",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
                       );
                     } else {
-                      return Text(
-                        "Uploaded by: Unknown User",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
+                      return Row(
+                        children: [
+                          Icon(Icons.person, size: 16, color: Colors.pink.shade700),
+                          SizedBox(width: 8),
+                          Text(
+                            "Uploaded by: Unknown User",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
                       );
                     }
                   },

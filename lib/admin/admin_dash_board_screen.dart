@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:women_safety_application/admin/admin_add_dangers_places.dart';
 import 'package:women_safety_application/admin/admin_view_posts.dart';
+import 'package:women_safety_application/admin/admin_view_users.dart';
 import 'package:women_safety_application/admin/admin_view_videos.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
@@ -24,7 +25,10 @@ class AdminDashboardScreen extends StatelessWidget {
               icon: Icons.person,
               title: "View Users",
               onTap: () {
+                
                 // Navigate to View Users Screen
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => UsersListScreen(),));
+
               },
             ),
             _buildDashboardCard(

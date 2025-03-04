@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:women_safety_application/auth/forget_password_screen.dart';
 import 'package:women_safety_application/user/userinterface.dart';
  // Replace with your HomePage or main screen file.
 
@@ -178,8 +179,11 @@ class _LoginPageState extends State<LoginPage> {
                     // Forgot Password
                     GestureDetector(
                       onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Forgot Password pressed')),
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>  ForgotPasswordScreen(),
+                          ),  
                         );
                       },
                       child: const Text('Forgot Password?'),
